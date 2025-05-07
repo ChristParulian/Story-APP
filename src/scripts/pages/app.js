@@ -1,6 +1,11 @@
 import getRoutes from '../routes/routes';
 import { getActiveRoute } from '../routes/url-parser';
-import { isLoggedIn, logout } from '../utils/auth';
+import { isLoggedIn, logout, getUserName } from '../utils/auth';
+import { 
+  generateMainNavigationListTemplate,
+  generateUnauthenticatedNavigationListTemplate,
+  generateAuthenticatedNavigationListTemplate
+} from '../templates';
 
 class App {
   #content = null;
@@ -14,6 +19,7 @@ class App {
 
     this._init();
     this._setupAuthListener();
+    this._setupNavigation();
   }
 
   _init() {
@@ -27,6 +33,40 @@ class App {
     });
   }
 
+  _setupNavigation() {
+    const navList = document.getElementById('nav-list');
+    if (!navList) return;
+
+    const mainNavItems = generateMainNavigationListTemplate();
+    let authNavItems = '';
+
+    if (isLoggedIn()) {
+      authNavItems = generateAuthenticatedNavigationListTemplate(getUserName());
+    } else {
+      authNavItems = generateUnauthenticatedNavigationListTemplate();
+    }
+
+    navList.innerHTML = mainNavItems + authNavItems;
+    this._setupLogout();
+  }
+
+  _setupDrawer() {
+    this.#drawerButton.addEventListener('click', () => {
+      this.#navigationDrawer.classList.toggle('open');
+    });
+  }
+
+  _setupLogout() {
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+      if (confirm('Yakin ingin logout?')) {
+        logout();
+        window.dispatchEvent(new CustomEvent('auth-change', {
+          detail: { isAuthenticated: false }
+        }));
+      }
+    });
+  }
+
   _handleAuthChange(isAuthenticated) {
     const currentPath = window.location.hash.replace('#', '') || '/';
     
@@ -34,20 +74,8 @@ class App {
       window.location.hash = '#/';
     }
     
+    this._setupNavigation();
     this.renderPage();
-  }
-
-  _setupDrawer() {
-    // Kode drawer tetap sama
-  }
-
-  _setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      logout();
-      window.dispatchEvent(new CustomEvent('auth-change', {
-        detail: { isAuthenticated: false }
-      }));
-    });
   }
 
   async renderPage() {

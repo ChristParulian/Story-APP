@@ -247,3 +247,35 @@ header {
   background-color: #f8d7da;
   border-radius: 4px;
 }
+
+
+/* Header Dinamis */
+.user-greeting {
+  padding: 8px 12px;
+  font-weight: 500;
+  color: #333;
+}
+
+.logout-button {
+  padding: 6px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+}
+
+@media screen and (width > 1000px) {
+  .user-greeting {
+    color: #333;
+  }
+  
+  .logout-button {
+    margin-left: 10px;
+  }
+}

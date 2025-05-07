@@ -1,5 +1,6 @@
 import api from '../../../data/api';
 import CONFIG from '../../../config';
+import { saveUserData } from '../../../utils/auth';
 
 class LoginPresenter {
   constructor(view) {
@@ -17,13 +18,15 @@ class LoginPresenter {
       }
 
       localStorage.setItem(CONFIG.ACCESS_TOKEN_KEY, response.loginResult.token);
+      saveUserData(response.loginResult);
 
       window.dispatchEvent(new CustomEvent('auth-change', {
         detail: { isAuthenticated: true }
       }));
 
-      // Redirect langsung tanpa setTimeout
-      this.view.redirectTo('/');
+      setTimeout(() => {
+        this.view.redirectTo('/');
+      }, 500);
 
     } catch (error) {
       this.view.hideLoading();
