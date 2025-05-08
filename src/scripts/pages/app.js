@@ -1,6 +1,6 @@
 import getRoutes from '../routes/routes';
 import { getActiveRoute } from '../routes/url-parser';
-import { isLoggedIn, logout, getUserName } from '../utils/auth';
+import { isLoggedIn, logout, getUsername } from '../utils/auth';
 import { 
   generateMainNavigationListTemplate,
   generateUnauthenticatedNavigationListTemplate,
@@ -41,7 +41,8 @@ class App {
     let authNavItems = '';
 
     if (isLoggedIn()) {
-      authNavItems = generateAuthenticatedNavigationListTemplate(getUserName());
+      const userName = getUsername() || 'Pengguna';
+      authNavItems = generateAuthenticatedNavigationListTemplate(userName);
     } else {
       authNavItems = generateUnauthenticatedNavigationListTemplate();
     }
@@ -51,18 +52,28 @@ class App {
   }
 
   _setupDrawer() {
-    this.#drawerButton.addEventListener('click', () => {
+    this.#drawerButton?.addEventListener('click', () => {
       this.#navigationDrawer.classList.toggle('open');
+    });
+
+    // Close drawer when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!this.#navigationDrawer.contains(e.target) && 
+          e.target !== this.#drawerButton) {
+        this.#navigationDrawer.classList.remove('open');
+      }
     });
   }
 
   _setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
       if (confirm('Yakin ingin logout?')) {
         logout();
         window.dispatchEvent(new CustomEvent('auth-change', {
           detail: { isAuthenticated: false }
         }));
+        this.#navigationDrawer.classList.remove('open');
       }
     });
   }
@@ -95,6 +106,7 @@ class App {
 
     this.#content.innerHTML = await page.render();
     await page.afterRender();
+    this.#navigationDrawer.classList.remove('open');
   }
 }
 

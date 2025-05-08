@@ -2,6 +2,7 @@ import CONFIG from '../config.js';
 
 const ENDPOINTS = {
   LOGIN: `${CONFIG.BASE_URL}/login`,
+  REGISTER: `${CONFIG.BASE_URL}/register`,
   STORIES: `${CONFIG.BASE_URL}/stories`
 };
 
@@ -13,6 +14,17 @@ export default {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ email, password })
+    });
+    return response.json();
+  },
+
+  async register({ name, email, password }) {
+    const response = await fetch(ENDPOINTS.REGISTER, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, email, password })
     });
     return response.json();
   },

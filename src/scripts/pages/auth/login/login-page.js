@@ -23,6 +23,9 @@ class LoginPage {
             <div id="loadingSpinner" class="loading-spinner hidden"></div>
           </button>
         </form>
+        <div class="auth-link">
+          Belum punya akun? <a href="#/register">Daftar disini</a>
+        </div>
       </div>
     `;
   }

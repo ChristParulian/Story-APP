@@ -1,6 +1,6 @@
 import api from '../../../data/api';
 import CONFIG from '../../../config';
-import { saveUserData } from '../../../utils/auth';
+import { saveAuthData } from '../../../utils/auth';
 
 class LoginPresenter {
   constructor(view) {
@@ -17,8 +17,7 @@ class LoginPresenter {
         throw new Error(response.message);
       }
 
-      localStorage.setItem(CONFIG.ACCESS_TOKEN_KEY, response.loginResult.token);
-      saveUserData(response.loginResult);
+      saveAuthData(response.loginResult.token, response.loginResult.name);
 
       window.dispatchEvent(new CustomEvent('auth-change', {
         detail: { isAuthenticated: true }
