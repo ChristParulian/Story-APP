@@ -4,9 +4,13 @@ import L from 'leaflet';
 
 class HomePage {
   constructor() {
-    this._stories = [];
+    this._allStories = []; // Menyimpan semua data
+    this._currentStories = []; // Data yang ditampilkan per halaman
     this._map = null;
     this._markers = [];
+    this._currentPage = 1;
+    this._pageSize = 6; // Jumlah item per halaman
+    this._isLoading = false;
   }
 
   async render() {
@@ -14,86 +18,200 @@ class HomePage {
       <section class="content-container">
         <h1 class="page-title">Cerita Terkini</h1>
         
-        <div class="stories-grid" id="storiesContainer">
-          <!-- Stories will be loaded here -->
+        <div class="loading-indicator" id="loadingIndicator">
+          <div class="spinner"></div>
+          <p>Memuat cerita...</p>
         </div>
+        
+        <div class="stories-grid" id="storiesContainer"></div>
+        
+        <div class="pagination" id="paginationControls"></div>
         
         <div class="map-container">
           <h2>Lokasi Cerita</h2>
-          <div id="storyMap" style="height: 400px; width: 100%;"></div>
+          <div id="storyMap"></div>
         </div>
       </section>
     `;
   }
 
   async afterRender() {
-    await this._fetchStories();
     this._initMap();
-    this._renderStories();
-    this._plotMarkers();
+    await this._loadAllStories(); // Load semua data sekaligus
+    this._setupPagination();
+    this._renderCurrentPage();
   }
 
-  async _fetchStories() {
+  async _loadAllStories() {
+    this._showLoading(true);
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}/stories`, {
+      const response = await fetch(`${CONFIG.BASE_URL}/stories?size=100`, { // Request semua data
         headers: {
           'Authorization': `Bearer ${localStorage.getItem(CONFIG.ACCESS_TOKEN_KEY)}`
         }
       });
       const data = await response.json();
-      this._stories = data.listStory;
+      this._allStories = data.listStory;
     } catch (error) {
       console.error('Failed to fetch stories:', error);
+      this._showError('Gagal memuat cerita');
+    } finally {
+      this._showLoading(false);
     }
   }
 
-  _initMap() {
-    this._map = L.map('storyMap').setView([-2.5489, 118.0149], 5); // Center on Indonesia
+  _renderCurrentPage() {
+    const startIdx = (this._currentPage - 1) * this._pageSize;
+    this._currentStories = this._allStories.slice(startIdx, startIdx + this._pageSize);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(this._map);
-
-    delete L.Icon.Default.prototype._getIconUrl;
-  
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
-  });
-  }
-
-  _renderStories() {
     const container = document.getElementById('storiesContainer');
-    container.innerHTML = this._stories.map(story => `
+    container.innerHTML = this._currentStories.map(story => `
       <article class="story-card">
-        <img src="${story.photoUrl}" alt="Story by ${story.name}" class="story-image">
+        <img src="${story.photoUrl}" alt="Story by ${story.name}" class="story-image" 
+             onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
         <div class="story-content">
           <h3>${story.name}</h3>
           <p>${story.description}</p>
           <time datetime="${story.createdAt}">
-            ${new Date(story.createdAt).toLocaleDateString()}
+            ${new Date(story.createdAt).toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
           </time>
+          ${story.lat && story.lon ? `
+            <div class="story-location">
+              <i class="fas fa-map-marker-alt"></i>
+              Lokasi: ${story.lat.toFixed(3)}, ${story.lon.toFixed(3)}
+            </div>
+          ` : ''}
         </div>
       </article>
     `).join('');
+
+    this._plotMarkers();
+  }
+
+  _setupPagination() {
+    const totalPages = Math.ceil(this._allStories.length / this._pageSize);
+    const paginationContainer = document.getElementById('paginationControls');
+    
+    if (totalPages <= 1) {
+      paginationContainer.innerHTML = '';
+      return;
+    }
+
+    paginationContainer.innerHTML = `
+      <button class="pagination-btn prev-btn" id="prevPage" ${this._currentPage === 1 ? 'disabled' : ''}>
+        <i class="fas fa-chevron-left"></i> Sebelumnya
+      </button>
+      <span class="page-info">Halaman ${this._currentPage} dari ${totalPages}</span>
+      <button class="pagination-btn next-btn" id="nextPage" ${this._currentPage === totalPages ? 'disabled' : ''}>
+        Selanjutnya <i class="fas fa-chevron-right"></i>
+      </button>
+    `;
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      this._currentPage--;
+      this._renderCurrentPage();
+      this._updatePaginationControls();
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+      this._currentPage++;
+      this._renderCurrentPage();
+      this._updatePaginationControls();
+    });
+  }
+
+  _updatePaginationControls() {
+    const totalPages = Math.ceil(this._allStories.length / this._pageSize);
+    const paginationContainer = document.getElementById('paginationControls');
+    
+    if (totalPages <= 1) {
+      paginationContainer.innerHTML = '';
+      return;
+    }
+
+    paginationContainer.innerHTML = `
+      <button class="pagination-btn prev-btn" id="prevPage" ${this._currentPage === 1 ? 'disabled' : ''}>
+        <i class="fas fa-chevron-left"></i> Sebelumnya
+      </button>
+      <span class="page-info">Halaman ${this._currentPage} dari ${totalPages}</span>
+      <button class="pagination-btn next-btn" id="nextPage" ${this._currentPage === totalPages ? 'disabled' : ''}>
+        Selanjutnya <i class="fas fa-chevron-right"></i>
+      </button>
+    `;
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      this._currentPage--;
+      this._renderCurrentPage();
+      this._updatePaginationControls();
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+      this._currentPage++;
+      this._renderCurrentPage();
+      this._updatePaginationControls();
+    });
+  }
+
+  _showLoading(isLoading) {
+    this._isLoading = isLoading;
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) {
+      loader.style.display = isLoading ? 'flex' : 'none';
+    }
+    document.getElementById('storiesContainer').style.opacity = isLoading ? '0.5' : '1';
+  }
+
+  _showError(message) {
+    const container = document.getElementById('storiesContainer');
+    container.innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        ${message}
+      </div>
+    `;
+  }
+
+  _initMap() {
+    this._map = L.map('storyMap').setView([-2.5489, 118.0149], 5);
+
+    // Fix marker icons
+    delete L.Icon.Default.prototype._getIconUrl;
+    
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+    });
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(this._map);
   }
 
   _plotMarkers() {
     // Clear existing markers
-    this._markers.forEach(marker => marker.remove());
+    this._markers.forEach(marker => this._map.removeLayer(marker));
     this._markers = [];
 
-    this._stories.forEach(story => {
+    // Add new markers
+    this._currentStories.forEach(story => {
       if (story.lat && story.lon) {
         const marker = L.marker([story.lat, story.lon])
           .addTo(this._map)
-          .bindPopup(`<b>${story.name}</b><p>${story.description.substring(0, 50)}...</p>`);
+          .bindPopup(`
+            <b>${story.name}</b>
+            <p>${story.description.substring(0, 100)}${story.description.length > 100 ? '...' : ''}</p>
+            <img src="${story.photoUrl}" style="max-width: 150px; max-height: 100px;">
+          `);
         this._markers.push(marker);
       }
     });
 
-    // Auto-zoom to fit all markers
+    // Auto-zoom jika ada marker
     if (this._markers.length > 0) {
       const group = new L.featureGroup(this._markers);
       this._map.fitBounds(group.getBounds());
