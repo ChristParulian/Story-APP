@@ -2,15 +2,28 @@ import CONFIG from '../../config';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+// Fix Leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+});
+
 class HomePage {
   constructor() {
-    this._allStories = []; // Menyimpan semua data
-    this._currentStories = []; // Data yang ditampilkan per halaman
+    this._allStories = [];
+    this._currentStories = [];
     this._map = null;
     this._markers = [];
     this._currentPage = 1;
-    this._pageSize = 6; // Jumlah item per halaman
+    this._pageSize = 6;
     this._isLoading = false;
+    this._baseLayers = {
+      'Street': null,
+      'Satellite': null
+    };
   }
 
   async render() {
@@ -37,7 +50,7 @@ class HomePage {
 
   async afterRender() {
     this._initMap();
-    await this._loadAllStories(); // Load semua data sekaligus
+    await this._loadAllStories();
     this._setupPagination();
     this._renderCurrentPage();
   }
@@ -45,7 +58,7 @@ class HomePage {
   async _loadAllStories() {
     this._showLoading(true);
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}/stories?size=100`, { // Request semua data
+      const response = await fetch(`${CONFIG.BASE_URL}/stories?size=100`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem(CONFIG.ACCESS_TOKEN_KEY)}`
         }
@@ -178,17 +191,32 @@ class HomePage {
   _initMap() {
     this._map = L.map('storyMap').setView([-2.5489, 118.0149], 5);
 
-    // Fix marker icons
-    delete L.Icon.Default.prototype._getIconUrl;
-    
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
-    });
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    // MapTiler API Key
+    const apiKey = 'LWXYHfZ6vqc0OB0xURAz';
+
+    // Define base layers
+    this._baseLayers['Street'] = L.tileLayer(
+      `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${apiKey}`,
+      {
+        attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a> ' +
+                     '<a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>'
+      }
+    );
+
+    this._baseLayers['Satellite'] = L.tileLayer(
+      `https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${apiKey}`,
+      {
+        attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a> ' +
+                     '<a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>'
+      }
+    );
+
+    // Add default layer
+    this._baseLayers['Street'].addTo(this._map);
+
+    // Add layer control
+    L.control.layers(this._baseLayers, null, {
+      position: 'topright'
     }).addTo(this._map);
   }
 
@@ -211,7 +239,7 @@ class HomePage {
       }
     });
 
-    // Auto-zoom jika ada marker
+    // Auto-zoom if there are markers
     if (this._markers.length > 0) {
       const group = new L.featureGroup(this._markers);
       this._map.fitBounds(group.getBounds());
