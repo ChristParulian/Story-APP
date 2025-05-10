@@ -1,7 +1,7 @@
 export function generateMainNavigationListTemplate() {
   return `
     <li><a href="#/">Beranda</a></li>
-    <li><a href="#/about">Tentang</a></li>
+    <li><a href="#/new">Tambah Story</a></li>
   `;
 }
 
