@@ -37,5 +37,15 @@ export default {
       }
     });
     return response.json();
+  },
+
+  async getAllStories() {
+    const token = localStorage.getItem(CONFIG.ACCESS_TOKEN_KEY);
+    const response = await fetch(`${ENDPOINTS.STORIES}?size=100`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.json();
   }
 };
