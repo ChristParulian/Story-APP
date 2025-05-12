@@ -596,3 +596,28 @@ header {
     padding: 1.5rem;
   }
 }
+
+/* ===== SKIP LINK ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #ea6500;
+  color: white;
+  padding: 8px 16px;
+  z-index: 1001; /* Lebih tinggi dari header */
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+/* Untuk elemen yang difokuskan */
+#main-content:focus {
+  outline: none;
+}

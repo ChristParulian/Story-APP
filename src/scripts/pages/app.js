@@ -22,11 +22,28 @@ class App {
     this._init();
     this._setupAuthListener();
     this._setupNavigation();
+    this._setupSkipLink(); // Tambahkan ini
   }
 
   _init() {
     this._setupDrawer();
     this._setupLogout();
+  }
+
+  _setupSkipLink() {
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) {
+      skipLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          mainContent.setAttribute('tabindex', '-1');
+          mainContent.focus();
+          window.location.hash = '';
+          window.location.hash = '#main-content';
+        }
+      });
+    }
   }
 
   _setupAuthListener() {
