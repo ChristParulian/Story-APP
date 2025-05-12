@@ -21,3 +21,14 @@ export function generateAuthenticatedNavigationListTemplate(userName) {
     </li>
   `;
 }
+
+export function generateLoadingIndicatorTemplate() {
+  return `
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p class="loading-text">Memuat...</p>
+      </div>
+    </div>
+  `;
+}

@@ -1,5 +1,5 @@
-import StoryMap from '../../utils/map';
-import api from '../../data/api';
+import StoryMap from "../../utils/map";
+import api from "../../data/api";
 
 class HomePresenter {
   constructor(view) {
@@ -19,16 +19,16 @@ class HomePresenter {
       this._setupPagination();
       this._renderCurrentPage();
     } catch (error) {
-      console.error('Initialization error:', error);
-      this._showError('Gagal memuat halaman');
+      console.error("Initialization error:", error);
+      this._showError("Gagal memuat halaman");
     }
   }
 
   async _initMap() {
     try {
-      this._storyMap = new StoryMap('storyMap');
+      this._storyMap = new StoryMap("storyMap");
     } catch (error) {
-      console.error('Map initialization error:', error);
+      console.error("Map initialization error:", error);
       this._view.hideMapContainer();
     }
   }
@@ -39,8 +39,8 @@ class HomePresenter {
       const response = await api.getAllStories();
       this._allStories = response.listStory;
     } catch (error) {
-      console.error('Failed to fetch stories:', error);
-      this._showError('Gagal memuat cerita');
+      console.error("Failed to fetch stories:", error);
+      this._showError("Gagal memuat cerita");
     } finally {
       this._showLoading(false);
     }
@@ -48,12 +48,17 @@ class HomePresenter {
 
   _renderCurrentPage() {
     const startIdx = (this._currentPage - 1) * this._pageSize;
-    this._currentStories = this._allStories.slice(startIdx, startIdx + this._pageSize);
-    
+    this._currentStories = this._allStories.slice(
+      startIdx,
+      startIdx + this._pageSize,
+    );
+
     this._view.renderStories(this._currentStories);
-    
+
     if (this._storyMap) {
-      const storiesWithLocations = this._currentStories.filter(story => story.lat && story.lon);
+      const storiesWithLocations = this._currentStories.filter(
+        (story) => story.lat && story.lon,
+      );
       if (storiesWithLocations.length > 0) {
         this._storyMap.plotMarkers(storiesWithLocations);
       }
@@ -66,7 +71,7 @@ class HomePresenter {
       totalPages,
       currentPage: this._currentPage,
       onPrev: () => this._goToPrevPage(),
-      onNext: () => this._goToNextPage()
+      onNext: () => this._goToNextPage(),
     });
   }
 
@@ -91,7 +96,7 @@ class HomePresenter {
     const totalPages = Math.ceil(this._allStories.length / this._pageSize);
     this._view.updatePaginationControls({
       totalPages,
-      currentPage: this._currentPage
+      currentPage: this._currentPage,
     });
   }
 

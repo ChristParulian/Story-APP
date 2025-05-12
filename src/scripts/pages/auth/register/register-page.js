@@ -1,4 +1,4 @@
-import RegisterPresenter from './register-presenter';
+import RegisterPresenter from "./register-presenter";
 
 class RegisterPage {
   constructor() {
@@ -35,44 +35,44 @@ class RegisterPage {
   }
 
   async afterRender() {
-    const form = document.getElementById('registerForm');
-    form.addEventListener('submit', async (e) => {
+    const form = document.getElementById("registerForm");
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
       await this.presenter.handleRegister(name, email, password);
     });
   }
 
   showLoading() {
-    const btn = document.getElementById('submitBtn');
+    const btn = document.getElementById("submitBtn");
     btn.disabled = true;
-    document.getElementById('buttonText').textContent = 'Memproses...';
-    document.getElementById('loadingSpinner').classList.remove('hidden');
+    document.getElementById("buttonText").textContent = "Memproses...";
+    document.getElementById("loadingSpinner").classList.remove("hidden");
   }
 
   hideLoading() {
-    const btn = document.getElementById('submitBtn');
+    const btn = document.getElementById("submitBtn");
     btn.disabled = false;
-    document.getElementById('buttonText').textContent = 'Daftar';
-    document.getElementById('loadingSpinner').classList.add('hidden');
+    document.getElementById("buttonText").textContent = "Daftar";
+    document.getElementById("loadingSpinner").classList.add("hidden");
   }
 
   showError(message) {
-    const form = document.getElementById('registerForm');
-    const existingError = form.querySelector('.error-message');
+    const form = document.getElementById("registerForm");
+    const existingError = form.querySelector(".error-message");
     if (existingError) existingError.remove();
-    
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
+
+    const errorElement = document.createElement("div");
+    errorElement.className = "error-message";
     errorElement.innerHTML = message;
     form.prepend(errorElement);
-    
+
     setTimeout(() => {
-      errorElement.classList.add('fade-out');
+      errorElement.classList.add("fade-out");
       setTimeout(() => errorElement.remove(), 300);
     }, 5000);
   }

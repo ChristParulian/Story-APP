@@ -1,6 +1,6 @@
-import api from '../../../data/api';
-import CONFIG from '../../../config';
-import { saveAuthData } from '../../../utils/auth';
+import api from "../../../data/api";
+import CONFIG from "../../../config";
+import { saveAuthData } from "../../../utils/auth";
 
 class LoginPresenter {
   constructor(view) {
@@ -19,14 +19,15 @@ class LoginPresenter {
 
       saveAuthData(response.loginResult.token, response.loginResult.name);
 
-      window.dispatchEvent(new CustomEvent('auth-change', {
-        detail: { isAuthenticated: true }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("auth-change", {
+          detail: { isAuthenticated: true },
+        }),
+      );
 
       setTimeout(() => {
-        this.view.redirectTo('/');
+        this.view.redirectTo("/");
       }, 500);
-
     } catch (error) {
       this.view.hideLoading();
       this.view.showError(error.message);

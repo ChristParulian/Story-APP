@@ -1,4 +1,4 @@
-import LoginPresenter from './login-presenter';
+import LoginPresenter from "./login-presenter";
 
 class LoginPage {
   constructor() {
@@ -31,33 +31,33 @@ class LoginPage {
   }
 
   async afterRender() {
-    const form = document.getElementById('loginForm');
-    form.addEventListener('submit', async (e) => {
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       await this.presenter.handleLogin(email, password);
     });
   }
 
   showLoading() {
-    const submitBtn = document.getElementById('submitBtn');
-    const buttonText = document.getElementById('buttonText');
-    const spinner = document.getElementById('loadingSpinner');
-    
+    const submitBtn = document.getElementById("submitBtn");
+    const buttonText = document.getElementById("buttonText");
+    const spinner = document.getElementById("loadingSpinner");
+
     submitBtn.disabled = true;
-    buttonText.textContent = 'Memproses...';
-    spinner.classList.remove('hidden');
+    buttonText.textContent = "Memproses...";
+    spinner.classList.remove("hidden");
   }
 
   hideLoading() {
-    const submitBtn = document.getElementById('submitBtn');
-    const buttonText = document.getElementById('buttonText');
-    const spinner = document.getElementById('loadingSpinner');
-    
+    const submitBtn = document.getElementById("submitBtn");
+    const buttonText = document.getElementById("buttonText");
+    const spinner = document.getElementById("loadingSpinner");
+
     submitBtn.disabled = false;
-    buttonText.textContent = 'Masuk';
-    spinner.classList.add('hidden');
+    buttonText.textContent = "Masuk";
+    spinner.classList.add("hidden");
   }
 
   redirectTo(path) {
@@ -65,11 +65,11 @@ class LoginPage {
   }
 
   showError(message) {
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
+    const errorElement = document.createElement("div");
+    errorElement.className = "error-message";
     errorElement.textContent = message;
-    document.getElementById('loginForm').prepend(errorElement);
-    
+    document.getElementById("loginForm").prepend(errorElement);
+
     setTimeout(() => {
       errorElement.remove();
     }, 3000);

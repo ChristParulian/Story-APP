@@ -1,16 +1,18 @@
-import getRoutes from '../routes/routes';
-import { getActiveRoute } from '../routes/url-parser';
-import { isLoggedIn, logout, getUsername } from '../utils/auth';
-import { 
+import getRoutes from "../routes/routes";
+import { getActiveRoute } from "../routes/url-parser";
+import { isLoggedIn, logout, getUsername } from "../utils/auth";
+import {
   generateMainNavigationListTemplate,
   generateUnauthenticatedNavigationListTemplate,
-  generateAuthenticatedNavigationListTemplate
-} from '../templates';
+  generateAuthenticatedNavigationListTemplate,
+  generateLoadingIndicatorTemplate
+} from "../templates";
 
 class App {
   #content = null;
   #drawerButton = null;
   #navigationDrawer = null;
+  #loadingTimeout = null;
 
   constructor({ navigationDrawer, drawerButton, content }) {
     this.#content = content;
@@ -28,20 +30,20 @@ class App {
   }
 
   _setupAuthListener() {
-    window.addEventListener('auth-change', (event) => {
+    window.addEventListener("auth-change", (event) => {
       this._handleAuthChange(event.detail.isAuthenticated);
     });
   }
 
   _setupNavigation() {
-    const navList = document.getElementById('nav-list');
+    const navList = document.getElementById("nav-list");
     if (!navList) return;
 
     const mainNavItems = generateMainNavigationListTemplate();
-    let authNavItems = '';
+    let authNavItems = "";
 
     if (isLoggedIn()) {
-      const userName = getUsername() || 'Pengguna';
+      const userName = getUsername() || "Pengguna";
       authNavItems = generateAuthenticatedNavigationListTemplate(userName);
     } else {
       authNavItems = generateUnauthenticatedNavigationListTemplate();
@@ -52,39 +54,43 @@ class App {
   }
 
   _setupDrawer() {
-    this.#drawerButton?.addEventListener('click', () => {
-      this.#navigationDrawer.classList.toggle('open');
+    this.#drawerButton?.addEventListener("click", () => {
+      this.#navigationDrawer.classList.toggle("open");
     });
 
     // Close drawer when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!this.#navigationDrawer.contains(e.target) && 
-          e.target !== this.#drawerButton) {
-        this.#navigationDrawer.classList.remove('open');
+    document.addEventListener("click", (e) => {
+      if (
+        !this.#navigationDrawer.contains(e.target) &&
+        e.target !== this.#drawerButton
+      ) {
+        this.#navigationDrawer.classList.remove("open");
       }
     });
   }
 
   _setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+    document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
       e.preventDefault();
-      if (confirm('Yakin ingin logout?')) {
+      if (confirm("Yakin ingin logout?")) {
         logout();
-        window.dispatchEvent(new CustomEvent('auth-change', {
-          detail: { isAuthenticated: false }
-        }));
-        this.#navigationDrawer.classList.remove('open');
+        window.dispatchEvent(
+          new CustomEvent("auth-change", {
+            detail: { isAuthenticated: false },
+          }),
+        );
+        this.#navigationDrawer.classList.remove("open");
       }
     });
   }
 
   _handleAuthChange(isAuthenticated) {
-    const currentPath = window.location.hash.replace('#', '') || '/';
-    
-    if (isAuthenticated && currentPath === '/login') {
-      window.location.hash = '#/';
+    const currentPath = window.location.hash.replace("#", "") || "/";
+
+    if (isAuthenticated && currentPath === "/login") {
+      window.location.hash = "#/";
     }
-    
+
     this._setupNavigation();
     this.renderPage();
   }
@@ -93,9 +99,9 @@ class App {
     const url = getActiveRoute();
     const routes = getRoutes();
     const page = routes[url];
-    
+
     if (!page) {
-      window.location.hash = isLoggedIn() ? '#/' : '#/login';
+      window.location.hash = isLoggedIn() ? "#/" : "#/login";
       return;
     }
 
@@ -104,10 +110,41 @@ class App {
       return;
     }
 
-    this.#content.innerHTML = await page.render();
-    await page.afterRender();
-    this.#navigationDrawer.classList.remove('open');
-  }
+    // Clear any existing timeout
+    if (this.#loadingTimeout) {
+      clearTimeout(this.#loadingTimeout);
+    }
+
+    // Show loading with slight delay
+    this.#content.innerHTML = generateLoadingIndicatorTemplate();
+    const loadingElement = document.querySelector('.loading-overlay');
+    
+    // Only show loading if it takes more than 300ms
+    this.#loadingTimeout = setTimeout(() => {
+      loadingElement.classList.add('active');
+    }, 300);
+
+    try {
+      const content = await page.render();
+      this.#content.innerHTML = content;
+      await page.afterRender();
+    } catch (error) {
+      console.error('Error rendering page:', error);
+      this.#content.innerHTML = `<div class="error-message">Gagal memuat halaman</div>`;
+    } finally {
+      // Hide loading immediately
+      clearTimeout(this.#loadingTimeout);
+      const loadingElement = document.querySelector('.loading-overlay');
+      if (loadingElement) {
+        loadingElement.classList.remove('active');
+        // Remove after animation completes
+        setTimeout(() => {
+          loadingElement.remove();
+        }, 300);
+      }
+      this.#navigationDrawer.classList.remove("open");
+    }
+}
 }
 
 export default App;
