@@ -17,7 +17,7 @@ class HomePage {
       
       <div class="pagination" id="paginationControls"></div>
       
-      <div class="map-container" id="mapContainer">
+      <div class="map-container" id="mapContainer" style="z-index: 1;">
         <h2>Lokasi Cerita</h2>
         <div id="storyMap" style="height: 400px;"></div>
       </div>
@@ -91,7 +91,7 @@ class HomePage {
       }>
         <i class="fas fa-chevron-left"></i> Prev
       </button>
-      <span class="page-info"> ${currentPage} dari ${totalPages}</span>
+      <span class="page-info">${currentPage} dari ${totalPages}</span>
       <button class="pagination-btn next-btn" id="nextPage" ${
         currentPage === totalPages ? "disabled" : ""
       }>

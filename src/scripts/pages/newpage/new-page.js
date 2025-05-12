@@ -56,7 +56,7 @@ class NewPage {
               <i class="fas fa-location-arrow"></i> Use My Location
             </button>
             
-            <div id="mapContainer" class="storymap-container"></div>
+            <div id="mapContainer" class="storymap-container" style="position: relative; z-index: 1;></div>
             <p class="map-instruction">Click map/drag marker to select location</p>
           </div>
           
