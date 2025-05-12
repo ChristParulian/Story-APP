@@ -8,15 +8,15 @@ class LoginPage {
   async render() {
     return `
       <div class="login-container">
-        <h2 class="login-title">Masuk ke Dicoding Story</h2>
+        <h2 class="login-title">Masuk ke The Momento</h2>
         <form id="loginForm" class="login-form">
           <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" class="form-input" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" class="form-input" placeholder="Masukkan Email Anda" required>
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" class="form-input" required minlength="8">
+            <label for="password">Password:</label>
+            <input type="password" id="password" class="form-input" placeholder="Masukkan Password Anda" required minlength="8">
           </div>
           <button type="submit" class="login-button" id="submitBtn">
             <span id="buttonText">Masuk</span>

@@ -89,13 +89,13 @@ class HomePage {
       <button class="pagination-btn prev-btn" id="prevPage" ${
         currentPage === 1 ? "disabled" : ""
       }>
-        <i class="fas fa-chevron-left"></i> Sebelumnya
+        <i class="fas fa-chevron-left"></i> Prev
       </button>
-      <span class="page-info">Halaman ${currentPage} dari ${totalPages}</span>
+      <span class="page-info"> ${currentPage} dari ${totalPages}</span>
       <button class="pagination-btn next-btn" id="nextPage" ${
         currentPage === totalPages ? "disabled" : ""
       }>
-        Selanjutnya <i class="fas fa-chevron-right"></i>
+        Next <i class="fas fa-chevron-right"></i>
       </button>
     `;
 

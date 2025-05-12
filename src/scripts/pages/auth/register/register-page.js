@@ -8,19 +8,19 @@ class RegisterPage {
   async render() {
     return `
       <div class="auth-container">
-        <h2 class="auth-title">Daftar Akun</h2>
+        <h2 class="auth-title">Buat Akun</h2>
         <form id="registerForm" class="auth-form">
           <div class="form-group">
-            <label for="name">Nama Lengkap</label>
-            <input type="text" id="name" class="form-input" required minlength="3">
+            <label for="name">Nama:</label>
+            <input type="text" id="name" class="form-input" placeholder="Masukkan Nama Anda" required minlength="3">
           </div>
           <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" class="form-input" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" class="form-input" placeholder="Masukkan Email Anda" required>
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" class="form-input" required minlength="8">
+            <label for="password">Password:</label>
+            <input type="password" id="password" class="form-input" placeholder="Masukkan Password Anda" required minlength="8">
           </div>
           <button type="submit" class="auth-button" id="submitBtn">
             <span id="buttonText">Daftar</span>
