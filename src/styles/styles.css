@@ -621,3 +621,69 @@ header {
 #main-content:focus {
   outline: none;
 }
+
+/* ===== VIEW TRANSITIONS ===== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure the app container takes up full viewport */
+#app {
+  view-transition-name: root;
+}
+
+/* Disable transitions for elements that shouldn't animate */
+.loading-overlay,
+.navigation-drawer,
+.main-header,
+.skip-link {
+  view-transition-name: none;
+}
+
+/* Fallback for browsers without View Transition support */
+.no-view-transitions #main-content {
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.no-view-transitions .page-transition {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.no-view-transitions .page-transition.active {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -7,23 +7,23 @@ class HomePage {
   }
 
   async render() {
-    return `
-      <section class="content-container">
-        <h1 class="page-title">Cerita Terkini</h1>
-        
-        ${generateLoadingIndicatorTemplate()}
-        
-        <div class="stories-grid" id="storiesContainer"></div>
-        
-        <div class="pagination" id="paginationControls"></div>
-        
-        <div class="map-container" id="mapContainer">
-          <h2>Lokasi Cerita</h2>
-          <div id="storyMap" style="height: 400px;"></div>
-        </div>
-      </section>
-    `;
-  }
+  return `
+    <section class="content-container page-transition ${document.startViewTransition ? '' : 'active'}">
+      <h1 class="page-title">Cerita Terkini</h1>
+      
+      ${generateLoadingIndicatorTemplate()}
+      
+      <div class="stories-grid" id="storiesContainer"></div>
+      
+      <div class="pagination" id="paginationControls"></div>
+      
+      <div class="map-container" id="mapContainer">
+        <h2>Lokasi Cerita</h2>
+        <div id="storyMap" style="height: 400px;"></div>
+      </div>
+    </section>
+  `;
+}
 
   async afterRender() {
     await this._presenter.initialize();

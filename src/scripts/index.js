@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   skipLink.textContent = 'Skip to Content';
   document.body.insertBefore(skipLink, document.body.firstChild);
 
-
-
   // Force initial redirect if needed
   if (!isLoggedIn() && window.location.hash !== "#/login") {
     window.location.hash = "#/login";
@@ -25,9 +23,20 @@ document.addEventListener("DOMContentLoaded", () => {
     navigationDrawer: document.querySelector("#navigation-drawer"),
   });
 
-  app.renderPage();
+  // Handle initial render with transition if supported
+  const renderApp = () => {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        app.renderPage();
+      });
+    } else {
+      app.renderPage();
+    }
+  };
+
+  renderApp();
 
   window.addEventListener("hashchange", () => {
-    app.renderPage();
+    renderApp();
   });
 });

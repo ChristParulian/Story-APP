@@ -19,10 +19,15 @@ class App {
     this.#drawerButton = drawerButton;
     this.#navigationDrawer = navigationDrawer;
 
+    // Add fallback class if View Transitions not supported
+    if (!document.startViewTransition) {
+      document.documentElement.classList.add('no-view-transitions');
+    }
+
     this._init();
     this._setupAuthListener();
     this._setupNavigation();
-    this._setupSkipLink(); // Tambahkan ini
+    this._setupSkipLink();
   }
 
   _init() {
@@ -142,9 +147,14 @@ class App {
     }, 300);
 
     try {
-      const content = await page.render();
-      this.#content.innerHTML = content;
-      await page.afterRender();
+      if (document.startViewTransition) {
+        const transition = document.startViewTransition(async () => {
+          await this._renderPageContent(page);
+        });
+        await transition.finished;
+      } else {
+        await this._renderPageContent(page);
+      }
     } catch (error) {
       console.error('Error rendering page:', error);
       this.#content.innerHTML = `<div class="error-message">Gagal memuat halaman</div>`;
@@ -161,7 +171,18 @@ class App {
       }
       this.#navigationDrawer.classList.remove("open");
     }
-}
+  }
+
+  async _renderPageContent(page) {
+    try {
+      const content = await page.render();
+      this.#content.innerHTML = content;
+      await page.afterRender();
+    } catch (error) {
+      console.error('Error rendering page content:', error);
+      throw error;
+    }
+  }
 }
 
 export default App;
