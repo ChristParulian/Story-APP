@@ -127,7 +127,6 @@ class HomePage {
       loadingElement.classList.add("active");
     } else {
       loadingElement.classList.remove("active");
-      // Remove after animation completes
       setTimeout(() => {
         loadingElement.remove();
       }, 300);

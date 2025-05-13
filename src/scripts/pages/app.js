@@ -118,10 +118,9 @@ class App {
             },
           });
 
-          // Simulasi loading logout
           setTimeout(() => {
             logout();
-            Swal.close(); // Tutup loading
+            Swal.close();
             window.dispatchEvent(
               new CustomEvent("auth-change", {
                 detail: { isAuthenticated: false },
