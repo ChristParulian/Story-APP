@@ -8,20 +8,20 @@ class NewPage {
   async render() {
     return `
       <section class="content-container new-story-page page-transition ${document.startViewTransition ? '' : 'active'}">
-        <h1 class="page-title">Add New Story</h1>
+        <h1 class="page-title">Berbagi Cerita Baru</h1>
         
         <div class="form-container">
           <div class="form-group">
-            <label for="description">Story Description (Required):</label>
+            <label for="description">Deskripsi (Wajib):</label>
             <textarea id="description" class="form-control" rows="5" 
-              placeholder="Write your story here..." required></textarea>
+              placeholder="Tulis cerita anda disini..." required></textarea>
           </div>
           
           <div class="form-group">
-            <label>Story Photo (Required, max 1MB):</label>
+            <label>Foto (Wajib, max 1MB):</label>
             <div class="photo-options">
               <button type="button" id="useCamera" class="btn btn-secondary">
-                <i class="fas fa-camera"></i> Use Camera
+                <i class="fas fa-camera"></i> Camera
               </button>
               <button type="button" id="uploadFile" class="btn btn-secondary">
                 <i class="fas fa-upload"></i> Upload File
@@ -33,10 +33,10 @@ class NewPage {
               <video id="cameraPreview" autoplay playsinline></video>
               <div class="camera-controls">
                 <button type="button" id="capturePhoto" class="btn btn-primary">
-                  <i class="fas fa-camera"></i> Capture Photo
+                  <i class="fas fa-camera"></i> Ambil Foto
                 </button>
                 <button type="button" id="cancelCamera" class="btn btn-danger">
-                  <i class="fas fa-times"></i> Cancel
+                  <i class="fas fa-times"></i> Batal
                 </button>
               </div>
             </div>
@@ -44,25 +44,25 @@ class NewPage {
             <div id="photoPreviewContainer" class="photo-preview-container">
               <img id="photoPreview" src="" alt="Preview">
               <button type="button" id="removePhoto" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Remove Photo
+                <i class="fas fa-trash"></i> Hapus Foto
               </button>
             </div>
           </div>
           
           <div class="form-group">
-            <label>Story Location (Optional):</label>
-            <p>Click on map, drag marker, or use current location</p>
+            <label>Lokasi (Opsional):</label>
+            <p>Klik di peta, pindahkan marker, atau gunakan lokasi saat ini.</p>
             <button type="button" id="useCurrentLocation" class="btn btn-secondary">
-              <i class="fas fa-location-arrow"></i> Use My Location
+              <i class="fas fa-location-arrow"></i> Lokasi Saya
             </button>
             
             <div id="mapContainer" class="storymap-container" style="position: relative; z-index: 1;></div>
-            <p class="map-instruction">Click map/drag marker to select location</p>
+            <p class="map-instruction">Klik di peta/pindahkan marker</p>
           </div>
           
           <div class="form-actions">
             <button type="button" id="submitStory" class="btn btn-primary">
-              <i class="fas fa-paper-plane"></i> Submit Story
+              <i class="fas fa-paper-plane"></i> Bagikan Cerita
             </button>
           </div>
         </div>

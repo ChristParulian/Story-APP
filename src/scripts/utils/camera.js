@@ -8,7 +8,7 @@ class CameraHandler {
 
   async start(videoElementId) {
     this.stop();
-    
+
     this._videoElement = document.getElementById(videoElementId);
     if (!this._videoElement) {
       throw new Error("Video element not found");
@@ -16,17 +16,17 @@ class CameraHandler {
 
     try {
       const constraints = {
-        video: { 
+        video: {
           facingMode: "environment",
           width: { ideal: this._idealResolution.width },
-          height: { ideal: this._idealResolution.height }
+          height: { ideal: this._idealResolution.height },
         },
         audio: false,
       };
 
       this._stream = await navigator.mediaDevices.getUserMedia(constraints);
       this._videoElement.srcObject = this._stream;
-      
+
       await new Promise((resolve) => {
         this._videoElement.onloadedmetadata = () => {
           this._videoElement.play();
@@ -34,11 +34,13 @@ class CameraHandler {
           resolve(true);
         };
       });
-      
+
       return true;
     } catch (error) {
       console.error("Camera error:", error);
-      throw new Error("Failed to access camera. Please ensure camera permissions are granted.");
+      throw new Error(
+        "Failed to access camera. Please ensure camera permissions are granted."
+      );
     }
   }
 
@@ -47,12 +49,12 @@ class CameraHandler {
       this._stream.getTracks().forEach((track) => track.stop());
       this._stream = null;
     }
-    
+
     if (this._videoElement) {
       this._videoElement.srcObject = null;
       this._videoElement.onloadedmetadata = null;
     }
-    
+
     this._isCameraActive = false;
   }
 
@@ -63,26 +65,43 @@ class CameraHandler {
 
     const videoWidth = this._videoElement.videoWidth;
     const videoHeight = this._videoElement.videoHeight;
-    
+
     const canvas = document.createElement("canvas");
     canvas.width = videoWidth;
     canvas.height = videoHeight;
     const ctx = canvas.getContext("2d");
-    
     ctx.drawImage(this._videoElement, 0, 0, canvas.width, canvas.height);
 
-    return new Promise((resolve) => {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) throw new Error("Failed to capture image");
-          resolve(new File([blob], "photo.jpg", { 
-            type: "image/jpeg",
-            lastModified: Date.now()
-          }));
-        },
-        "image/jpeg",
-        0.9 // Kualitas tetap 90% untuk HD
-      );
+    const maxSize = 1024 * 1024; // 1MB
+    let quality = 0.9;
+
+    const tryCompress = () => {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject(new Error("Failed to capture image"));
+            resolve(blob);
+          },
+          "image/jpeg",
+          quality
+        );
+      });
+    };
+
+    let blob = await tryCompress();
+
+    while (blob.size > maxSize && quality > 0.3) {
+      quality -= 0.05;
+      blob = await tryCompress();
+    }
+
+    if (blob.size > maxSize) {
+      throw new Error("Unable to compress image below 1MB");
+    }
+
+    return new File([blob], "photo.jpg", {
+      type: "image/jpeg",
+      lastModified: Date.now(),
     });
   }
 
@@ -96,7 +115,7 @@ class CameraHandler {
     const newFacingMode = currentFacingMode === "user" ? "environment" : "user";
 
     videoTrack.applyConstraints({
-      facingMode: newFacingMode
+      facingMode: newFacingMode,
     });
   }
 

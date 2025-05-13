@@ -7,6 +7,7 @@ import {
   generateAuthenticatedNavigationListTemplate,
   generateLoadingIndicatorTemplate
 } from "../templates";
+import Swal from 'sweetalert2';
 
 class App {
   #content = null;
@@ -19,7 +20,6 @@ class App {
     this.#drawerButton = drawerButton;
     this.#navigationDrawer = navigationDrawer;
 
-    // Add fallback class if View Transitions not supported
     if (!document.startViewTransition) {
       document.documentElement.classList.add('no-view-transitions');
     }
@@ -80,7 +80,6 @@ class App {
       this.#navigationDrawer.classList.toggle("open");
     });
 
-    // Close drawer when clicking outside
     document.addEventListener("click", (e) => {
       if (
         !this.#navigationDrawer.contains(e.target) &&
@@ -92,18 +91,46 @@ class App {
   }
 
   _setupLogout() {
-    document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (confirm("Yakin ingin logout?")) {
-        logout();
-        window.dispatchEvent(
-          new CustomEvent("auth-change", {
-            detail: { isAuthenticated: false },
-          }),
-        );
-        this.#navigationDrawer.classList.remove("open");
-      }
-    });
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const result = await Swal.fire({
+          title: 'Yakin ingin logout?',
+          text: 'Sesi kamu akan berakhir.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Logout',
+          cancelButtonText: 'Batal',
+        });
+
+        if (result.isConfirmed) {
+          // Tampilkan loading swal
+          Swal.fire({
+            title: 'Sedang logout...',
+            text: 'Harap tunggu sebentar',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Simulasi loading logout
+          setTimeout(() => {
+            logout();
+            Swal.close(); // Tutup loading
+            window.dispatchEvent(
+              new CustomEvent("auth-change", {
+                detail: { isAuthenticated: false },
+              }),
+            );
+            this.#navigationDrawer.classList.remove("open");
+          }, 1500); // 1.5 detik delay biar loading terasa
+        }
+      });
+    }
   }
 
   _handleAuthChange(isAuthenticated) {
@@ -132,16 +159,13 @@ class App {
       return;
     }
 
-    // Clear any existing timeout
     if (this.#loadingTimeout) {
       clearTimeout(this.#loadingTimeout);
     }
 
-    // Show loading with slight delay
     this.#content.innerHTML = generateLoadingIndicatorTemplate();
     const loadingElement = document.querySelector('.loading-overlay');
-    
-    // Only show loading if it takes more than 300ms
+
     this.#loadingTimeout = setTimeout(() => {
       loadingElement.classList.add('active');
     }, 300);
@@ -159,15 +183,11 @@ class App {
       console.error('Error rendering page:', error);
       this.#content.innerHTML = `<div class="error-message">Gagal memuat halaman</div>`;
     } finally {
-      // Hide loading immediately
       clearTimeout(this.#loadingTimeout);
       const loadingElement = document.querySelector('.loading-overlay');
       if (loadingElement) {
-        loadingElement.classList.remove('active');
-        // Remove after animation completes
-        setTimeout(() => {
-          loadingElement.remove();
-        }, 300);
+        loadingElement.classList.remove("active");
+        setTimeout(() => loadingElement.remove(), 300);
       }
       this.#navigationDrawer.classList.remove("open");
     }

@@ -19,7 +19,7 @@ class LoginPage {
             <input type="password" id="password" class="form-input" placeholder="Masukkan Password Anda" required minlength="8">
           </div>
           <button type="submit" class="login-button" id="submitBtn">
-            <span id="buttonText">Masuk</span>
+            <span id="buttonText">Login</span>
             <div id="loadingSpinner" class="loading-spinner hidden"></div>
           </button>
         </form>
@@ -46,7 +46,7 @@ class LoginPage {
     const spinner = document.getElementById("loadingSpinner");
 
     submitBtn.disabled = true;
-    buttonText.textContent = "Memproses...";
+    buttonText.textContent = "Loading...";
     spinner.classList.remove("hidden");
   }
 

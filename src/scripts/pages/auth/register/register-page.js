@@ -28,7 +28,7 @@ class RegisterPage {
           </button>
         </form>
         <div class="auth-link">
-          Sudah punya akun? <a href="#/login">Masuk disini</a>
+          Sudah punya akun? <a href="#/login">Login disini</a>
         </div>
       </div>
     `;
@@ -50,7 +50,7 @@ class RegisterPage {
   showLoading() {
     const btn = document.getElementById("submitBtn");
     btn.disabled = true;
-    document.getElementById("buttonText").textContent = "Memproses...";
+    document.getElementById("buttonText").textContent = "Loading...";
     document.getElementById("loadingSpinner").classList.remove("hidden");
   }
 
