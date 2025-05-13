@@ -1,6 +1,7 @@
 import CameraHandler from "../../utils/camera";
 import StoryMap from "../../utils/map";
 import api from "../../data/api";
+import Swal from "sweetalert2";
 
 class NewPresenter {
   constructor(view) {
@@ -49,7 +50,9 @@ class NewPresenter {
     this._addListener("uploadFile", "click", () => this._triggerFileInput());
     this._addListener("photoInput", "change", (e) => this._handleFileUpload(e));
     this._addListener("removePhoto", "click", () => this._removePhoto());
-    this._addListener("useCurrentLocation", "click", () => this._getCurrentLocation());
+    this._addListener("useCurrentLocation", "click", () =>
+      this._getCurrentLocation(),
+    );
     this._addListener("submitStory", "click", () => this._submitStory());
   }
 
@@ -80,7 +83,12 @@ class NewPresenter {
       await this._camera.start("cameraPreview");
       this._view.showCameraView();
     } catch (error) {
-      this._view.showError(error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Kamera Gagal Dibuka",
+        text: "Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.",
+        confirmButtonColor: "#493628",
+      });
     }
   }
 
@@ -96,7 +104,12 @@ class NewPresenter {
       this._view.showPhotoPreview(this._photoPreviewUrl);
       this._stopCamera();
     } catch (error) {
-      this._view.showError("Failed to capture photo: " + error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Mengambil Foto",
+        text: error.message,
+        confirmButtonColor: "#493628",
+      });
     }
   }
 
@@ -109,7 +122,12 @@ class NewPresenter {
     if (!file) return;
 
     if (file.size > 1024 * 1024) {
-      this._view.showError("File size too large. Maximum 1MB allowed.");
+      Swal.fire({
+        icon: "error",
+        title: "Ukuran Foto Terlalu Besar",
+        text: "Ukuran maksimum yang diperbolehkan adalah 1MB.",
+        confirmButtonColor: "#493628",
+      });
       return;
     }
 
@@ -139,7 +157,12 @@ class NewPresenter {
       this._setLocation(position.coords.latitude, position.coords.longitude);
     } catch (error) {
       console.error("Geolocation error:", error);
-      this._view.showError("Failed to get current location. Please ensure location permissions are granted.");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Mendapatkan Lokasi",
+        text: "Tidak dapat mengakses lokasi Anda. Pastikan izin lokasi sudah diberikan.",
+        confirmButtonColor: "#493628",
+      });
     }
   }
 
@@ -161,12 +184,22 @@ class NewPresenter {
 
   async _submitStory() {
     if (!this._description.trim()) {
-      this._view.showError("Story description is required");
+      Swal.fire({
+        icon: "error",
+        title: "Deskripsi Kosong",
+        text: "Mohon isi deskripsi sebelum mengirim.",
+        confirmButtonColor: "#493628",
+      });
       return;
     }
 
     if (!this._photoFile) {
-      this._view.showError("Photo is required");
+      Swal.fire({
+        icon: "error",
+        title: "Foto Tidak Ada",
+        text: "Mohon tambahkan foto sebelum mengirim.",
+        confirmButtonColor: "#493628",
+      });
       return;
     }
 
@@ -181,16 +214,27 @@ class NewPresenter {
 
     try {
       const response = await api.addStory(formData);
-      
+
       if (response.error) {
         throw new Error(response.message);
       }
 
-      this._view.showSuccess("Story added successfully!");
-      this._view.navigateToHome();
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Cerita berhasil ditambahkan!",
+        confirmButtonColor: "#493628",
+      }).then(() => {
+        this._view.navigateToHome();
+      });
     } catch (error) {
       console.error("Story submission failed:", error);
-      this._view.showError(error.message || "Failed to submit story");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Menambahkan Cerita",
+        text: error.message || "Terjadi kesalahan saat mengirim cerita.",
+        confirmButtonColor: "#493628",
+      });
     }
   }
 

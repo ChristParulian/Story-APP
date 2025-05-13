@@ -7,7 +7,7 @@ class NewPage {
 
   async render() {
     return `
-      <section class="content-container new-story-page page-transition ${document.startViewTransition ? '' : 'active'}">
+      <section class="content-container new-story-page page-transition ${document.startViewTransition ? "" : "active"}">
         <h1 class="page-title">Berbagi Cerita Baru</h1>
         
         <div class="form-container">

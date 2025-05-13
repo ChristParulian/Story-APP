@@ -5,10 +5,10 @@ import RegisterPage from "../pages/auth/register/register-page";
 import { isLoggedIn } from "../utils/auth";
 
 const getRoutes = () => ({
-  '/': isLoggedIn() ? new HomePage() : null,
-  '/login': !isLoggedIn() ? new LoginPage() : { redirect: '/' },
-  '/register': !isLoggedIn() ? new RegisterPage() : { redirect: '/' },
-  '/new': isLoggedIn() ? new NewPage() : { redirect: '/' }
+  "/": isLoggedIn() ? new HomePage() : null,
+  "/login": !isLoggedIn() ? new LoginPage() : { redirect: "/" },
+  "/register": !isLoggedIn() ? new RegisterPage() : { redirect: "/" },
+  "/new": isLoggedIn() ? new NewPage() : { redirect: "/" },
 });
 
 export default getRoutes;

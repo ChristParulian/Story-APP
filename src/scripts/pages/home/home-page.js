@@ -7,8 +7,8 @@ class HomePage {
   }
 
   async render() {
-  return `
-    <section class="content-container page-transition ${document.startViewTransition ? '' : 'active'}">
+    return `
+    <section class="content-container page-transition ${document.startViewTransition ? "" : "active"}">
       <h1 class="page-title">Cerita Terkini</h1>
       
       ${generateLoadingIndicatorTemplate()}
@@ -23,7 +23,7 @@ class HomePage {
       </div>
     </section>
   `;
-}
+  }
 
   async afterRender() {
     await this._presenter.initialize();
@@ -60,18 +60,19 @@ class HomePage {
           }
         </div>
       </article>
-    `
+    `,
       )
       .join("");
   }
 
   _setupImageErrorHandlers() {
     const images = document.querySelectorAll(".story-image");
-    images.forEach(img => {
+    images.forEach((img) => {
       img.onerror = () => {
-        img.src = 'https://via.placeholder.com/300x200?text=Gambar+Tidak+Tersedia';
-        img.style.objectFit = 'cover';
-        img.style.backgroundColor = '#f5f5f5';
+        img.src =
+          "https://via.placeholder.com/300x200?text=Gambar+Tidak+Tersedia";
+        img.style.objectFit = "cover";
+        img.style.backgroundColor = "#f5f5f5";
         img.onerror = null; // Prevent infinite loop
       };
     });
@@ -113,25 +114,25 @@ class HomePage {
   }
 
   showLoading(isLoading) {
-  let loadingElement = document.querySelector('.loading-overlay');
-  
-  if (!loadingElement) {
-    loadingElement = document.createElement('div');
-    loadingElement.innerHTML = generateLoadingIndicatorTemplate();
-    document.body.appendChild(loadingElement.firstChild);
-    loadingElement = document.querySelector('.loading-overlay');
-  }
+    let loadingElement = document.querySelector(".loading-overlay");
 
-  if (isLoading) {
-    loadingElement.classList.add('active');
-  } else {
-    loadingElement.classList.remove('active');
-    // Remove after animation completes
-    setTimeout(() => {
-      loadingElement.remove();
-    }, 300);
+    if (!loadingElement) {
+      loadingElement = document.createElement("div");
+      loadingElement.innerHTML = generateLoadingIndicatorTemplate();
+      document.body.appendChild(loadingElement.firstChild);
+      loadingElement = document.querySelector(".loading-overlay");
+    }
+
+    if (isLoading) {
+      loadingElement.classList.add("active");
+    } else {
+      loadingElement.classList.remove("active");
+      // Remove after animation completes
+      setTimeout(() => {
+        loadingElement.remove();
+      }, 300);
+    }
   }
-}
 
   showError(message) {
     const container = document.getElementById("storiesContainer");

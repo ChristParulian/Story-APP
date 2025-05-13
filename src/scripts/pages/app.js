@@ -5,9 +5,9 @@ import {
   generateMainNavigationListTemplate,
   generateUnauthenticatedNavigationListTemplate,
   generateAuthenticatedNavigationListTemplate,
-  generateLoadingIndicatorTemplate
+  generateLoadingIndicatorTemplate,
 } from "../templates";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 class App {
   #content = null;
@@ -21,7 +21,7 @@ class App {
     this.#navigationDrawer = navigationDrawer;
 
     if (!document.startViewTransition) {
-      document.documentElement.classList.add('no-view-transitions');
+      document.documentElement.classList.add("no-view-transitions");
     }
 
     this._init();
@@ -36,16 +36,16 @@ class App {
   }
 
   _setupSkipLink() {
-    const skipLink = document.querySelector('.skip-link');
+    const skipLink = document.querySelector(".skip-link");
     if (skipLink) {
-      skipLink.addEventListener('click', (e) => {
+      skipLink.addEventListener("click", (e) => {
         e.preventDefault();
-        const mainContent = document.getElementById('main-content');
+        const mainContent = document.getElementById("main-content");
         if (mainContent) {
-          mainContent.setAttribute('tabindex', '-1');
+          mainContent.setAttribute("tabindex", "-1");
           mainContent.focus();
-          window.location.hash = '';
-          window.location.hash = '#main-content';
+          window.location.hash = "";
+          window.location.hash = "#main-content";
         }
       });
     }
@@ -97,24 +97,25 @@ class App {
         e.preventDefault();
 
         const result = await Swal.fire({
-          title: 'Yakin ingin logout?',
-          text: 'Sesi kamu akan berakhir.',
-          icon: 'warning',
+          title: "Yakin Ingin Logout?",
+          text: "Sesi kamu akan berakhir.",
+          icon: "warning",
+          confirmButtonColor: "#493628",
+          cancelButtonColor: "#AB886D",
           showCancelButton: true,
-          confirmButtonText: 'Logout',
-          cancelButtonText: 'Batal',
+          confirmButtonText: "Logout",
+          cancelButtonText: "Batal",
         });
 
         if (result.isConfirmed) {
-          // Tampilkan loading swal
           Swal.fire({
-            title: 'Sedang logout...',
-            text: 'Harap tunggu sebentar',
+            title: "Sedang logout...",
+            text: "Harap tunggu sebentar",
             allowOutsideClick: false,
             allowEscapeKey: false,
             didOpen: () => {
               Swal.showLoading();
-            }
+            },
           });
 
           // Simulasi loading logout
@@ -127,7 +128,7 @@ class App {
               }),
             );
             this.#navigationDrawer.classList.remove("open");
-          }, 1500); // 1.5 detik delay biar loading terasa
+          }, 1000);
         }
       });
     }
@@ -164,10 +165,10 @@ class App {
     }
 
     this.#content.innerHTML = generateLoadingIndicatorTemplate();
-    const loadingElement = document.querySelector('.loading-overlay');
+    const loadingElement = document.querySelector(".loading-overlay");
 
     this.#loadingTimeout = setTimeout(() => {
-      loadingElement.classList.add('active');
+      loadingElement.classList.add("active");
     }, 300);
 
     try {
@@ -180,11 +181,11 @@ class App {
         await this._renderPageContent(page);
       }
     } catch (error) {
-      console.error('Error rendering page:', error);
+      console.error("Error rendering page:", error);
       this.#content.innerHTML = `<div class="error-message">Gagal memuat halaman</div>`;
     } finally {
       clearTimeout(this.#loadingTimeout);
-      const loadingElement = document.querySelector('.loading-overlay');
+      const loadingElement = document.querySelector(".loading-overlay");
       if (loadingElement) {
         loadingElement.classList.remove("active");
         setTimeout(() => loadingElement.remove(), 300);
@@ -199,7 +200,7 @@ class App {
       this.#content.innerHTML = content;
       await page.afterRender();
     } catch (error) {
-      console.error('Error rendering page content:', error);
+      console.error("Error rendering page content:", error);
       throw error;
     }
   }

@@ -9,25 +9,22 @@ class RegisterPresenter {
     try {
       this.view.showLoading();
 
-      // 1. Register process
       await registerUser({ name, email, password });
 
-      // 2. Auto-login after successful registration
       await loginUser(email, password);
 
-      // 3. Update UI state
       window.dispatchEvent(
         new CustomEvent("auth-change", {
           detail: { isAuthenticated: true },
         }),
       );
 
-      // 4. Redirect to home
+      //Redirect to home
       this.view.redirectTo("/");
     } catch (error) {
       this.view.hideLoading();
 
-      // Handle specific error cases
+      // Handle cases
       let errorMessage = error.message;
       if (error.message.includes("unique")) {
         errorMessage =

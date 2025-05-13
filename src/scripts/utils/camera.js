@@ -39,7 +39,7 @@ class CameraHandler {
     } catch (error) {
       console.error("Camera error:", error);
       throw new Error(
-        "Failed to access camera. Please ensure camera permissions are granted."
+        "Failed to access camera. Please ensure camera permissions are granted.",
       );
     }
   }
@@ -83,7 +83,7 @@ class CameraHandler {
             resolve(blob);
           },
           "image/jpeg",
-          quality
+          quality,
         );
       });
     };
