@@ -37,16 +37,26 @@ class App {
 
   _setupSkipLink() {
     const skipLink = document.querySelector(".skip-link");
-    if (skipLink) {
+    const mainContent = document.getElementById("main-content");
+    
+    if (skipLink && mainContent) {
       skipLink.addEventListener("click", (e) => {
         e.preventDefault();
-        const mainContent = document.getElementById("main-content");
-        if (mainContent) {
-          mainContent.setAttribute("tabindex", "-1");
-          mainContent.focus();
-          window.location.hash = "";
-          window.location.hash = "#main-content";
-        }
+        
+        // Ensure main content is focusable
+        mainContent.setAttribute("tabindex", "-1");
+        
+        // Focus and scroll to main content
+        mainContent.focus();
+        mainContent.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+        
+        // Remove tabindex after focus to prevent keyboard trap
+        setTimeout(() => {
+          mainContent.removeAttribute("tabindex");
+        }, 1000);
       });
     }
   }
