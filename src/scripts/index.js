@@ -3,14 +3,14 @@ import App from "./pages/app.js";
 import { isLoggedIn } from "./utils/auth";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Create skip link
+  // skip link
   const skipLink = document.createElement("a");
   skipLink.href = "#main-content";
   skipLink.className = "skip-link";
   skipLink.textContent = "Skip to Content";
   document.body.insertBefore(skipLink, document.body.firstChild);
 
-  // Handle initial auth state
+  // Handle auth 
   if (!isLoggedIn() && window.location.hash !== "#/login") {
     window.location.hash = "#/login";
   } else if (isLoggedIn() && window.location.hash === "#/login") {

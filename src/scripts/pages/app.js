@@ -43,17 +43,14 @@ class App {
       skipLink.addEventListener("click", (e) => {
         e.preventDefault();
         
-        // Ensure main content is focusable
         mainContent.setAttribute("tabindex", "-1");
         
-        // Focus and scroll to main content
         mainContent.focus();
         mainContent.scrollIntoView({
           behavior: "smooth",
           block: "start"
         });
         
-        // Remove tabindex after focus to prevent keyboard trap
         setTimeout(() => {
           mainContent.removeAttribute("tabindex");
         }, 1000);
