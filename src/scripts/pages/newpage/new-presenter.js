@@ -13,14 +13,12 @@ class NewPresenter {
     this._map = null;
     this._marker = null;
     this._camera = new CameraHandler();
-    this._eventListeners = [];
   }
 
   async initialize() {
     try {
       this._initMap();
       this._setupEventListeners();
-      this._setupNavigationListener();
     } catch (error) {
       console.error("Initialization error:", error);
       this._view.showError("Failed to initialize page");
@@ -29,7 +27,7 @@ class NewPresenter {
 
   _initMap() {
     try {
-      this._map = new StoryMap("mapContainer");
+      this._map = new StoryMap(this._view.getMapContainer());
       this._map.map.on("click", (e) => {
         this._setLocation(e.latlng.lat, e.latlng.lng);
       });
@@ -40,47 +38,23 @@ class NewPresenter {
   }
 
   _setupEventListeners() {
-    this._addListener("description", "input", (e) => {
+    this._view.bindDescriptionChange((e) => {
       this._description = e.target.value;
     });
 
-    this._addListener("useCamera", "click", () => this._handleCameraStart());
-    this._addListener("cancelCamera", "click", () => this._stopCamera());
-    this._addListener("capturePhoto", "click", () => this._capturePhoto());
-    this._addListener("uploadFile", "click", () => this._triggerFileInput());
-    this._addListener("photoInput", "change", (e) => this._handleFileUpload(e));
-    this._addListener("removePhoto", "click", () => this._removePhoto());
-    this._addListener("useCurrentLocation", "click", () =>
-      this._getCurrentLocation(),
-    );
-    this._addListener("submitStory", "click", () => this._submitStory());
-  }
-
-  _addListener(elementId, event, handler) {
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.addEventListener(event, handler);
-      this._eventListeners.push({ element, event, handler });
-    }
-  }
-
-  _setupNavigationListener() {
-    const handler = () => {
-      if (window.location.hash !== "#/new") {
-        this.destroy();
-      }
-    };
-    window.addEventListener("hashchange", handler);
-    this._eventListeners.push({
-      element: window,
-      event: "hashchange",
-      handler,
-    });
+    this._view.bindUseCamera(() => this._handleCameraStart());
+    this._view.bindCancelCamera(() => this._stopCamera());
+    this._view.bindCapturePhoto(() => this._capturePhoto());
+    this._view.bindUploadFile(() => this._triggerFileInput());
+    this._view.bindPhotoInputChange((e) => this._handleFileUpload(e));
+    this._view.bindRemovePhoto(() => this._removePhoto());
+    this._view.bindUseCurrentLocation(() => this._getCurrentLocation());
+    this._view.bindSubmitStory(() => this._submitStory());
   }
 
   async _handleCameraStart() {
     try {
-      await this._camera.start("cameraPreview");
+      await this._camera.start(this._view.getCameraPreview());
       this._view.showCameraView();
     } catch (error) {
       Swal.fire({
@@ -114,7 +88,7 @@ class NewPresenter {
   }
 
   _triggerFileInput() {
-    document.getElementById("photoInput").click();
+    this._view.getPhotoInput().click();
   }
 
   _handleFileUpload(event) {
@@ -243,9 +217,6 @@ class NewPresenter {
     if (this._photoPreviewUrl) {
       URL.revokeObjectURL(this._photoPreviewUrl);
     }
-    this._eventListeners.forEach(({ element, event, handler }) => {
-      element.removeEventListener(event, handler);
-    });
     if (this._map) {
       this._map.clearMarkers();
     }
