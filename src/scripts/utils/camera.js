@@ -6,13 +6,14 @@ class CameraHandler {
     this._idealResolution = { width: 1280, height: 960 }; // 4:3 HD
   }
 
-  async start(videoElementId) {
+  async start(videoElement) {
     this.stop();
 
-    this._videoElement = document.getElementById(videoElementId);
-    if (!this._videoElement) {
-      throw new Error("Video element not found");
+    if (!(videoElement instanceof HTMLVideoElement)) {
+      throw new Error("Invalid video element provided");
     }
+
+    this._videoElement = videoElement;
 
     try {
       const constraints = {
@@ -24,22 +25,41 @@ class CameraHandler {
         audio: false,
       };
 
-      this._stream = await navigator.mediaDevices.getUserMedia(constraints);
+      this._stream = await navigator.mediaDevices.getUserMedia(constraints)
+        .catch(async (error) => {
+          console.warn("Ideal resolution failed, trying fallback...", error);
+          // Fallback ke constraints lebih sederhana
+          return await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "environment"
+            },
+            audio: false
+          });
+        });
+
       this._videoElement.srcObject = this._stream;
 
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
         this._videoElement.onloadedmetadata = () => {
-          this._videoElement.play();
-          this._isCameraActive = true;
-          resolve(true);
+          this._videoElement.play()
+            .then(() => {
+              this._isCameraActive = true;
+              resolve(true);
+            })
+            .catch(reject);
         };
+        
+        setTimeout(() => {
+          reject(new Error("Camera metadata loading timed out"));
+        }, 5000);
       });
 
       return true;
     } catch (error) {
       console.error("Camera error:", error);
+      this.stop();
       throw new Error(
-        "Failed to access camera. Please ensure camera permissions are granted.",
+        `Gagal mengakses kamera: ${error.message || 'Pastikan izin kamera sudah diberikan'}`
       );
     }
   }

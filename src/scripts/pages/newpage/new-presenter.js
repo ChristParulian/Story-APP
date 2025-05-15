@@ -53,18 +53,20 @@ class NewPresenter {
   }
 
   async _handleCameraStart() {
-    try {
-      await this._camera.start(this._view.getCameraPreview());
-      this._view.showCameraView();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Kamera Gagal Dibuka",
-        text: "Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.",
-        confirmButtonColor: "#493628",
-      });
-    }
+  try {
+    await this._camera.start(this._view.getCameraPreview());
+    this._view.showCameraView();
+  } catch (error) {
+    console.error("Camera start error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Kamera Gagal Dibuka",
+      text: error.message || "Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.",
+      confirmButtonColor: "#493628",
+    });
+    this._stopCamera();
   }
+}
 
   _stopCamera() {
     this._camera.stop();
