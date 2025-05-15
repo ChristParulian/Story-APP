@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   skipLink.textContent = "Skip to Content";
   document.body.insertBefore(skipLink, document.body.firstChild);
 
-  // Handle auth 
+  // Handle auth
   if (!isLoggedIn() && window.location.hash !== "#/login") {
     window.location.hash = "#/login";
   } else if (isLoggedIn() && window.location.hash === "#/login") {

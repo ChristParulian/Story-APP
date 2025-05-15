@@ -91,7 +91,7 @@ class NewPage {
       cameraPreview: document.getElementById("cameraPreview"),
       photoPreviewContainer: document.getElementById("photoPreviewContainer"),
       photoPreview: document.getElementById("photoPreview"),
-      mapContainer: document.getElementById("mapContainer")
+      mapContainer: document.getElementById("mapContainer"),
     };
   }
 
@@ -164,7 +164,8 @@ class NewPage {
   }
 
   showMapError() {
-    this._elements.mapContainer.innerHTML = '<p class="error-message">Failed to load map</p>';
+    this._elements.mapContainer.innerHTML =
+      '<p class="error-message">Failed to load map</p>';
   }
 
   showError(message) {

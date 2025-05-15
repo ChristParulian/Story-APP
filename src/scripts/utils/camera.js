@@ -25,15 +25,16 @@ class CameraHandler {
         audio: false,
       };
 
-      this._stream = await navigator.mediaDevices.getUserMedia(constraints)
+      this._stream = await navigator.mediaDevices
+        .getUserMedia(constraints)
         .catch(async (error) => {
           console.warn("Ideal resolution failed, trying fallback...", error);
           // Fallback ke constraints lebih sederhana
           return await navigator.mediaDevices.getUserMedia({
             video: {
-              facingMode: "environment"
+              facingMode: "environment",
             },
-            audio: false
+            audio: false,
           });
         });
 
@@ -41,14 +42,15 @@ class CameraHandler {
 
       await new Promise((resolve, reject) => {
         this._videoElement.onloadedmetadata = () => {
-          this._videoElement.play()
+          this._videoElement
+            .play()
             .then(() => {
               this._isCameraActive = true;
               resolve(true);
             })
             .catch(reject);
         };
-        
+
         setTimeout(() => {
           reject(new Error("Camera metadata loading timed out"));
         }, 5000);
@@ -59,7 +61,7 @@ class CameraHandler {
       console.error("Camera error:", error);
       this.stop();
       throw new Error(
-        `Gagal mengakses kamera: ${error.message || 'Pastikan izin kamera sudah diberikan'}`
+        `Gagal mengakses kamera: ${error.message || "Pastikan izin kamera sudah diberikan"}`,
       );
     }
   }

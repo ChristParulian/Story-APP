@@ -1040,6 +1040,10 @@ P {
   .map-instruction {
     font-size: 0.75rem;
   }
+
+  .page-info {
+  font-size: 0.8rem;
+}
 }
 
 /* ===== SKIP LINK ===== */
