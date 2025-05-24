@@ -34,3 +34,7 @@ export const saveAuthData = (token, name) => {
   localStorage.setItem(CONFIG.ACCESS_TOKEN_KEY, token);
   localStorage.setItem("user_name", name);
 };
+
+export const getAccessToken = () => {
+  return localStorage.getItem(CONFIG.ACCESS_TOKEN_KEY);
+};

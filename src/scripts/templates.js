@@ -11,10 +11,11 @@ export function generateUnauthenticatedNavigationListTemplate() {
   `;
 }
 
-export function generateAuthenticatedNavigationListTemplate(userName) {
+export function generateAuthenticatedNavigationListTemplate(userName, isSubscribed = false) {
   return `
     <li class="user-menu">
       <div class="user-greeting">Hi, ${userName}</div>
+      ${isSubscribed ? generateUnsubscribeNotifButton() : generateSubscribeNotifButton()}
       <button id="logoutBtn" class="logout-button">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
@@ -30,5 +31,21 @@ export function generateLoadingIndicatorTemplate() {
         <p class="loading-text">Memuat...</p>
       </div>
     </div>
+  `;
+}
+
+export function generateSubscribeNotifButton() {
+  return `
+    <button id="subscribeNotifBtn" class="notif-button">
+      <i class="fas fa-bell"></i> Subscribe
+    </button>
+  `;
+}
+
+export function generateUnsubscribeNotifButton() {
+  return `
+    <button id="unsubscribeNotifBtn" class="notif-button">
+      <i class="fas fa-bell-slash"></i> Unsubscribe
+    </button>
   `;
 }

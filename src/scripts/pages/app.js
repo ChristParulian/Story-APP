@@ -8,6 +8,7 @@ import {
   generateLoadingIndicatorTemplate,
 } from "../templates";
 import Swal from "sweetalert2";
+import { initNotificationButtons } from "../utils/notification-helper";
 
 class App {
   #content = null;
@@ -64,7 +65,7 @@ class App {
     });
   }
 
-  _setupNavigation() {
+  async _setupNavigation() {
     const navList = document.getElementById("nav-list");
     if (!navList) return;
 
@@ -73,13 +74,27 @@ class App {
 
     if (isLoggedIn()) {
       const userName = getUsername() || "Pengguna";
-      authNavItems = generateAuthenticatedNavigationListTemplate(userName);
+      // CEK STATUS SUBSCRIPTION
+      let isSubscribed = false;
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration('/sw.bundle.js');
+        if (registration) {
+          const subscription = await registration.pushManager.getSubscription();
+          isSubscribed = !!subscription;
+        }
+      }
+      authNavItems = generateAuthenticatedNavigationListTemplate(userName, isSubscribed);
     } else {
       authNavItems = generateUnauthenticatedNavigationListTemplate();
     }
 
     navList.innerHTML = mainNavItems + authNavItems;
     this._setupLogout();
+
+    // Inisialisasi tombol notifikasi setelah navigasi dirender
+    if (isLoggedIn()) {
+      initNotificationButtons();
+    }
   }
 
   _setupDrawer() {

@@ -35,7 +35,7 @@ class HomePage {
     container.innerHTML = stories
       .map(
         (story) => `
-      <article class="story-card">
+      <article class="story-card" data-id="${story.id}" style="cursor:pointer">
         <img src="${story.photoUrl}" alt="Gagal memuat gambar ${story.name}" class="story-image"
              data-story-id="${story.id}" loading="lazy">
         <div class="story-content">
@@ -63,6 +63,13 @@ class HomePage {
     `,
       )
       .join("");
+
+    // Tambahkan event listener untuk navigasi ke detail
+    container.querySelectorAll(".story-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        window.location.hash = `#/stories/${card.dataset.id}`;
+      });
+    });
   }
 
   _setupImageErrorHandlers() {
